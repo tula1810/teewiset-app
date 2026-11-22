@@ -662,11 +662,13 @@ function vAtt(){
   const open=A.open,busy=!!S.clocking;
   let h='<section class="panel"><div class="clockbox"><div class="small muted">'+esc(A.me.name)+'</div>';
   if(open)h+='<div>เข้างานแล้ว <b>'+esc(open.time.slice(0,5))+'</b> · '+esc(open.shift)+' '+attPill(open.status)+'</div>';
+  if(!open){const sh=S.ashift||(new Date().getHours()>=4&&new Date().getHours()<13?'กะเช้า':'กะเย็น');S.ashift=sh;
+    h+='<div class="toggle" style="width:100%;max-width:360px"><button class="opt'+(sh==='กะเช้า'?'':'')+'" data-ashift="กะเช้า" aria-pressed="'+(sh==='กะเช้า')+'">☀️ กะเช้า<br><small>08:00–18:00</small></button><button class="opt" data-ashift="กะเย็น" aria-pressed="'+(sh==='กะเย็น')+'">🌙 กะเย็น<br><small>18:00–08:00</small></button></div>'}
   h+='<button class="clockbtn'+(open?' out':'')+'" data-clock="'+(open?'out':'in')+'"'+(busy?' disabled':'')+'>'+(busy?esc(S.clocking):open?'📷 ลงเวลาออกงาน':'📷 ลงเวลาเข้างาน')+'</button>';
   h+='<button class="linkbtn" style="color:var(--muted)" data-clock="'+(open?'in':'out')+'"'+(busy?' disabled':'')+'>'+(open?'ลงเวลาเข้าใหม่':'ลงเวลาออก (ลืมลงเวลาเข้า)')+'</button>';
   const R=S.clockRes;
   if(R)h+='<div class="clockres"><b>✓ บันทึกเวลา'+esc(R.kind)+' '+esc(R.time.slice(0,5))+'</b> · '+esc(R.shift)+'<br>'+attPill(R.status)+' '+attPlace(R)+'</div>';
-  h+='<p class="pdpa">กดแล้วจะถ่ายรูปตัวเอง 1 รูปและจับตำแหน่ง GPS ของโทรศัพท์ ใช้ตรวจสอบเวลาทำงานเท่านั้น เวลาที่บันทึกเป็นเวลาของระบบ รูปเก็บไว้ 90 วัน · กะเช้า 08:00–18:00 · กะดึก 18:00–08:00 · ต้องอยู่ห่างโรงแรมไม่เกิน '+A.hotel.radius+' ม.</p></div></section>';
+  h+='<p class="pdpa">กดแล้วจะถ่ายรูปตัวเอง 1 รูปและจับตำแหน่ง GPS ของโทรศัพท์ ใช้ตรวจสอบเวลาทำงานเท่านั้น เวลาที่บันทึกเป็นเวลาของระบบ รูปเก็บไว้ 90 วัน · กะเช้า 08:00–18:00 · กะเย็น 18:00–08:00 · ต้องอยู่ห่างโรงแรมไม่เกิน '+A.hotel.radius+' ม.</p></div></section>';
   h+='<section class="panel"><h2>ประวัติของฉัน</h2>'+(A.mine.length?A.mine.map(r=>'<div class="attrow"><span class="t">'+esc(r.time.slice(0,5))+'</span><span>'+dShort(r.date)+' · '+esc(r.kind)+' · '+esc(r.shift)+'</span>'+attPill(r.status)+attPlace(r)+'</div>').join(''):'<div class="empty small">ยังไม่มีการลงเวลา</div>')+'</section>';
   if(A.all){
     h+='<section class="panel"><h2 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">ลงเวลาทุกคน <button class="btn" data-attday="-1" aria-label="วันก่อน">‹</button><span>'+(A.date===A.today?'วันนี้':dLong(A.date))+'</span><button class="btn" data-attday="1" aria-label="วันถัดไป">›</button>'+(A.date!==A.today?'<button class="btn" data-attday="0">วันนี้</button>':'')+'</h2>';
@@ -690,7 +692,7 @@ async function finishClock(file){
   try{const photo=await shrinkPhoto(file);const g=await geoP;
     if(!g)toast('ไม่ได้ตำแหน่ง GPS ระบบจะบันทึกว่า "ไม่มีตำแหน่ง" (ควรเปิดตำแหน่งให้แอปนี้)');
     S.clocking='กำลังบันทึก…';render(true);
-    const r=await call('clock',{c:{kind:clockKind,photo,lat:g?g.lat:null,lng:g?g.lng:null,acc:g?g.acc:null}});
+    const r=await call('clock',{c:{kind:clockKind,shift:S.ashift,photo,lat:g?g.lat:null,lng:g?g.lng:null,acc:g?g.acc:null}});
     S.A=r.state;S.adate=r.state.date;S.clockRes=r.saved;toast('บันทึกเวลา'+r.saved.kind+'แล้ว')}
   catch(e){if(e.message)toast(e.message)}
   finally{S.clocking=null;render(true)}}
@@ -746,6 +748,7 @@ view.addEventListener('click',async e=>{
   const cbk=e.target.closest('[data-cbk]');if(cbk){openBooking(cbk.dataset.cbk,S.C);return}
   const cd=e.target.closest('[data-cd]');if(cd){S.csel=cd.dataset.cd;render(true);return}
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.ashift){S.ashift=b.dataset.ashift;render(true);return}
   if(b.dataset.clock){if(!S.clocking)startClock(b.dataset.clock);return}
   if(b.dataset.attday!==undefined){const n=+b.dataset.attday;S.adate=n===0?localToday():dAdd(S.adate,n);loadA();return}
   if(b.dataset.attphoto){const id=b.dataset.attphoto;b.disabled=true;b.textContent='กำลังโหลด…';call('attPhoto',{id}).then(r=>{S.aphotos[id]=r.photo;render(true)}).catch(e=>{toast(e.message);render(true)});return}
