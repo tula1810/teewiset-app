@@ -209,10 +209,22 @@ details.more .bform{margin-top:10px}
 #snow i{position:absolute;top:-24px;color:#fff;font-style:normal;user-select:none;text-shadow:0 0 1px rgba(140,25,40,.9),0 0 5px rgba(140,25,40,.45);animation:snowfall linear infinite;will-change:transform}
 @keyframes snowfall{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(var(--sway),52vh,0) rotate(180deg)}100%{transform:translate3d(0,108vh,0) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){#snow{display:none}}
+/* ลงเวลา */
+.clockbox{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:8px 0}
+.clockbtn{width:100%;max-width:360px;min-height:64px;border-radius:16px;border:0;font-size:19px;font-weight:700;cursor:pointer;color:#fff;background:var(--ok)}
+.clockbtn.out{background:var(--accent)}
+.clockbtn:disabled{opacity:.5}
+.clockres{width:100%;max-width:360px;border-radius:12px;padding:10px 12px;background:var(--sunk);text-align:left;font-size:14px}
+.pill.good{background:var(--ok);color:var(--ok-ink)}.pill.warn{background:var(--tmp);color:#fff}.pill.bad{background:var(--out);color:#fff}
+.attrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.attrow:first-of-type{border-top:0}.attrow .t{font-weight:600;font-variant-numeric:tabular-nums;min-width:44px}
+.attrow img{width:96px;border-radius:8px;display:block}
+.pdpa{font-size:12px;color:var(--muted);max-width:420px}
 </style>
 </head>
 <body>
 <div id="busy" hidden></div>
+<input type="file" id="att-cam" accept="image/*" capture="user" hidden>
 
 <section id="login" class="login" hidden>
   <div class="lcard">
@@ -243,6 +255,7 @@ details.more .bform{margin-top:10px}
       <div class="bar" style="padding-block:0 6px"><div class="me"><span id="me-name"></span><button class="linkbtn" id="b-refresh">รีเฟรช</button><button class="linkbtn" id="b-snow" hidden aria-label="เปิด/ปิดหิมะ">❄</button><button class="linkbtn" id="b-logout">ออกจากระบบ</button></div></div>
       <nav class="tabs" id="tabs">
         <button data-tab="calendar">ปฏิทิน</button>
+        <button data-tab="att">ลงเวลา</button>
         <button data-tab="booking">การจอง</button>
         <button data-tab="record">รับเข้า / เบิกออก</button>
         <button data-tab="count">นับสต๊อก</button>
@@ -289,7 +302,8 @@ const cache={get(k){try{const v=localStorage.getItem('twc_'+k);return v?JSON.par
 const S={token:store.get('tw_token'),D:null,tab:'calendar',month:localToday().slice(0,7),date:localToday(),
   q:'',open:null,round:'mid',dirty:false,confirmDel:null,editUser:null,pin:'',busy:0,
   B:null,bdate:localToday(),bform:null,bloading:false,bbusy:null,
-  C:null,cmonth:localToday().slice(0,7),csel:localToday(),cloading:false};
+  C:null,cmonth:localToday().slice(0,7),csel:localToday(),cloading:false,
+  A:null,adate:localToday(),aphotos:{},clocking:null,clockRes:null};
 
 let toastT;
 function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3000)}
@@ -639,6 +653,48 @@ function vBooking(){
   return h;
 }
 async function loadB(){try{const r=await call('bookings',{date:S.bdate});cache.set('bk_'+r.date,r);if(r.date!==S.bdate&&!S.pendingOpen)return;S.B=r;if(S.pendingOpen){const id=S.pendingOpen;S.pendingOpen=null;openBooking(id);return}if(S.tab==='booking')render(true)}catch(e){if(e.message)toast(e.message)}}
+/* ---------- ลงเวลาเข้า-ออก ---------- */
+function attPill(st){const c=/^(ตรงเวลา|ปกติ|ในพื้นที่)$/.test(st)?'good':/^(สาย|ออกก่อน)/.test(st)?'warn':'bad';return '<span class="pill '+c+'">'+esc(st)+'</span>'}
+function attPlace(r){return r.area==='ไม่มีตำแหน่ง'?attPill('ไม่มีตำแหน่ง'):attPill(r.area)+(r.dist!=null?' <span class="small muted">ห่าง '+Number(r.dist).toLocaleString()+' ม.'+(r.acc?' (±'+r.acc+')':'')+'</span>':'')}
+function attPhotoCell(r){const p=S.aphotos[r.id];return p?'<img src="'+esc(p)+'" alt="รูปตอนลงเวลา '+esc(r.name)+'">':'<button class="btn" data-attphoto="'+esc(r.id)+'">ดูรูป</button>'}
+function vAtt(){
+  const A=S.A;if(!A)return '<div class="panel empty">กำลังโหลด…</div>';
+  const open=A.open,busy=!!S.clocking;
+  let h='<section class="panel"><div class="clockbox"><div class="small muted">'+esc(A.me.name)+'</div>';
+  if(open)h+='<div>เข้างานแล้ว <b>'+esc(open.time.slice(0,5))+'</b> · '+esc(open.shift)+' '+attPill(open.status)+'</div>';
+  h+='<button class="clockbtn'+(open?' out':'')+'" data-clock="'+(open?'out':'in')+'"'+(busy?' disabled':'')+'>'+(busy?esc(S.clocking):open?'📷 ลงเวลาออกงาน':'📷 ลงเวลาเข้างาน')+'</button>';
+  h+='<button class="linkbtn" style="color:var(--muted)" data-clock="'+(open?'in':'out')+'"'+(busy?' disabled':'')+'>'+(open?'ลงเวลาเข้าใหม่':'ลงเวลาออก (ลืมลงเวลาเข้า)')+'</button>';
+  const R=S.clockRes;
+  if(R)h+='<div class="clockres"><b>✓ บันทึกเวลา'+esc(R.kind)+' '+esc(R.time.slice(0,5))+'</b> · '+esc(R.shift)+'<br>'+attPill(R.status)+' '+attPlace(R)+'</div>';
+  h+='<p class="pdpa">กดแล้วจะถ่ายรูปตัวเอง 1 รูปและจับตำแหน่ง GPS ของโทรศัพท์ ใช้ตรวจสอบเวลาทำงานเท่านั้น เวลาที่บันทึกเป็นเวลาของระบบ รูปเก็บไว้ 90 วัน · กะเช้า 08:00–18:00 · กะดึก 18:00–08:00 · ต้องอยู่ห่างโรงแรมไม่เกิน '+A.hotel.radius+' ม.</p></div></section>';
+  h+='<section class="panel"><h2>ประวัติของฉัน</h2>'+(A.mine.length?A.mine.map(r=>'<div class="attrow"><span class="t">'+esc(r.time.slice(0,5))+'</span><span>'+dShort(r.date)+' · '+esc(r.kind)+' · '+esc(r.shift)+'</span>'+attPill(r.status)+attPlace(r)+'</div>').join(''):'<div class="empty small">ยังไม่มีการลงเวลา</div>')+'</section>';
+  if(A.all){
+    h+='<section class="panel"><h2 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">ลงเวลาทุกคน <button class="btn" data-attday="-1" aria-label="วันก่อน">‹</button><span>'+(A.date===A.today?'วันนี้':dLong(A.date))+'</span><button class="btn" data-attday="1" aria-label="วันถัดไป">›</button>'+(A.date!==A.today?'<button class="btn" data-attday="0">วันนี้</button>':'')+'</h2>';
+    h+=A.all.length?A.all.map(r=>'<div class="attrow"><span class="t">'+esc(r.time.slice(0,5))+'</span><b>'+esc(r.name)+'</b><span>'+esc(r.kind)+' · '+esc(r.shift)+(r.date!==A.date?' ('+dShort(r.date)+')':'')+'</span>'+attPill(r.status)+attPlace(r)+'<span style="margin-left:auto">'+attPhotoCell(r)+'</span></div>').join(''):'<div class="empty small">ไม่มีการลงเวลาในวันนี้</div>';
+    h+='</section>';
+  }
+  return h;
+}
+async function loadA(){if(S.aloading)return;S.aloading=true;try{const r=await call('attendance',{att:{date:S.adate}});if(r.date===S.adate){S.A=r;if(S.tab==='att')render(true)}}catch(e){if(e.message)toast(e.message)}finally{S.aloading=false}}
+let clockKind='in',geoP=null;
+function getGeo(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
+  navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy}),()=>res(null),{enableHighAccuracy:true,timeout:15000,maximumAge:0})})}
+function shrinkPhoto(file){return new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(file);
+  img.onload=()=>{URL.revokeObjectURL(u);let w=360,q=.6,out='';
+    for(let k=0;k<6;k++){const sc=Math.min(1,w/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<46000)break;w=Math.round(w*.8);q=Math.max(.35,q-.08)}
+    res(out)};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('เปิดรูปไม่ได้ ลองถ่ายใหม่'))};img.src=u})}
+function startClock(kind){clockKind=kind;S.clockRes=null;geoP=getGeo();const cam=$('#att-cam');cam.value='';cam.click()}
+async function finishClock(file){
+  S.clocking='กำลังจับตำแหน่ง GPS…';render(true);
+  try{const photo=await shrinkPhoto(file);const g=await geoP;
+    if(!g)toast('ไม่ได้ตำแหน่ง GPS ระบบจะบันทึกว่า "ไม่มีตำแหน่ง" (ควรเปิดตำแหน่งให้แอปนี้)');
+    S.clocking='กำลังบันทึก…';render(true);
+    const r=await call('clock',{c:{kind:clockKind,photo,lat:g?g.lat:null,lng:g?g.lng:null,acc:g?g.acc:null}});
+    S.A=r.state;S.adate=r.state.date;S.clockRes=r.saved;toast('บันทึกเวลา'+r.saved.kind+'แล้ว')}
+  catch(e){if(e.message)toast(e.message)}
+  finally{S.clocking=null;render(true)}}
+
 function render(force){
   if(!S.D)return;
   $('#m-label').textContent=thM(S.month);
@@ -648,10 +704,11 @@ function render(force){
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===S.tab)));
   if(!force&&(S.dirty||(document.activeElement&&view.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')))return;
   const sy=window.scrollY;
-  document.querySelector('.month').hidden=S.tab==='booking'||S.tab==='calendar';
+  document.querySelector('.month').hidden=S.tab==='booking'||S.tab==='calendar'||S.tab==='att';
+  if(S.tab==='att'&&(!S.A||S.A.date!==S.adate))loadA();
   if(S.tab==='booking'&&!S.B&&!S.bloading){const c=cache.get('bk_'+S.bdate);if(c&&!S.pendingOpen)S.B=c;S.bloading=true;loadB().finally(()=>S.bloading=false)}
   if(S.tab==='calendar'&&(!S.C||S.C.month!==S.cmonth)){const c=cache.get('cal_'+S.cmonth);if(c)S.C=c;if(!cInflight[S.cmonth])loadC()}
-  view.innerHTML=S.tab==='calendar'?vCalendar():S.tab==='booking'?vBooking():S.tab==='count'?vCount():S.tab==='report'?vReport():S.tab==='settings'?vSettings():S.tab==='users'?vUsers():vRecord();
+  view.innerHTML=S.tab==='att'?vAtt():S.tab==='calendar'?vCalendar():S.tab==='booking'?vBooking():S.tab==='count'?vCount():S.tab==='report'?vReport():S.tab==='settings'?vSettings():S.tab==='users'?vUsers():vRecord();
   window.scrollTo(0,sy);
   const q=$('#f-qty');if(q)q.focus({preventScroll:true});
 }
@@ -675,6 +732,7 @@ view.addEventListener('input',e=>{const t=e.target;
     cell.textContent=d==null?'':d===0?'ตรง':sign(d);cell.className='q '+(d<0?'neg':d>0?'pos':'');return}
   if(S.tab==='settings'&&t.id!=='s-new')S.dirty=true;
 });
+$('#att-cam').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)finishClock(f)});
 view.addEventListener('change',e=>{const id=e.target.id;
   if(id==='b-date'&&e.target.value){S.bdate=e.target.value;S.bform=null;loadB();return}
   if(S.bform&&id==='f-pick'&&e.target.value){setF('cin',e.target.value);return}
@@ -688,6 +746,9 @@ view.addEventListener('click',async e=>{
   const cbk=e.target.closest('[data-cbk]');if(cbk){openBooking(cbk.dataset.cbk,S.C);return}
   const cd=e.target.closest('[data-cd]');if(cd){S.csel=cd.dataset.cd;render(true);return}
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.clock){if(!S.clocking)startClock(b.dataset.clock);return}
+  if(b.dataset.attday!==undefined){const n=+b.dataset.attday;S.adate=n===0?localToday():dAdd(S.adate,n);loadA();return}
+  if(b.dataset.attphoto){const id=b.dataset.attphoto;b.disabled=true;b.textContent='กำลังโหลด…';call('attPhoto',{id}).then(r=>{S.aphotos[id]=r.photo;render(true)}).catch(e=>{toast(e.message);render(true)});return}
   if(b.dataset.cm!==undefined){const n=+b.dataset.cm;if(n===0)S.cmonth=localToday().slice(0,7);else{let [y,m]=S.cmonth.split('-').map(Number);m+=n;if(m>12){m=1;y++}if(m<1){m=12;y--}S.cmonth=y+'-'+pad(m)}
     S.csel=S.cmonth===localToday().slice(0,7)?localToday():S.cmonth+'-01';render(true);return}
   if(b.dataset.f){setF(b.dataset.f,b.dataset.v);return}
