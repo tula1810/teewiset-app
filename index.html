@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TEEWISET ท่าเรือ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8e0f20">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TEEWISET">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Sarabun:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f7f0ee; --surface:#ffffff; --sunk:#f3e6e3; --ink:#2b1517; --muted:#7b5d5a; --line:#ead7d2;
+  --accent:#b0182b; --accent-ink:#ffffff; --in:#1d7446; --out:#c2261c; --warn:#9a5b00; --warn-bg:#fff1d6;
+  --tmp:#b45309; --clean:#2563a8; --ok:#16a34a; --ok-ink:#ffffff; --head1:#8e0f20; --head2:#c41e34; --head-ink:#ffffff;
+  --f-ui:"Anuphan","Sarabun",system-ui,sans-serif; --f-form:"Sarabun","Anuphan",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#170e0f; --surface:#221516; --sunk:#2d1c1e; --ink:#f3e6e5; --muted:#b39a98; --line:#3d2729;
+  --accent:#ff5a6e; --accent-ink:#2a0509; --in:#5cc98a; --out:#ff8a7a; --warn:#f2bd5c; --warn-bg:#33270f;
+  --tmp:#f0a050; --clean:#7fb2f0; --ok:#3ccf7e; --ok-ink:#06210f; --head1:#5a0a15; --head2:#8e1426; --head-ink:#ffffff; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,var(--head1),var(--head2));color:var(--head-ink);border-bottom:0;box-shadow:0 2px 10px rgba(80,10,20,.18);padding-top:env(safe-area-inset-top,0px)}
+header.top .brand span,header.top .me{color:rgba(255,255,255,.78)}
+header.top .linkbtn{color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.4)}
+header.top .month button{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff}
+header.top nav.tabs button{color:rgba(255,255,255,.82)}
+header.top nav.tabs button[aria-current="true"]{background:#fff;color:var(--head1);font-weight:600}
+header.top :focus-visible{outline-color:#fff}
+.bar{display:flex;align-items:center;gap:12px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;line-height:1.15;margin-right:auto}
+.brand b{font-size:18px;letter-spacing:.1em}
+.brand span{font-size:12px;color:var(--muted)}
+.month{display:flex;align-items:center;gap:4px}
+.month button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.month strong{min-width:70px;text-align:center;font-variant-numeric:tabular-nums}
+.me{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.linkbtn{border:0;background:none;color:var(--accent);cursor:pointer;padding:4px;font-size:13px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;padding-block:0 8px}
+nav.tabs button{border:0;background:none;padding:7px 14px;border-radius:999px;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
+nav.tabs button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+main{padding-block:16px 48px;display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(80,10,20,.05)}
+.panel h2{font-size:15px;margin:0 0 10px;font-weight:600;color:var(--ink)}
+.muted{color:var(--muted)} .small{font-size:13px}
+.row-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:12px;color:var(--muted)}
+input[type=text],input[type=date],input[type=month],input[type=number],input[type=password],input[type=time],select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;min-width:0}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:var(--ok-ink);font-weight:600;padding-inline:18px}
+.btn.ok::before{content:"\2713";margin-right:6px;font-weight:700}
+.btn.in{background:var(--in);border-color:var(--in);color:#fff}
+.btn.out{background:var(--out);border-color:var(--out);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;background:var(--warn-bg);color:var(--warn);border:0;cursor:pointer}
+.item{border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item>button{display:flex;width:100%;align-items:center;gap:10px;padding:11px 4px;border:0;background:none;cursor:pointer;text-align:left}
+.item .nm{flex:1;min-width:0}
+.item .bal{font-variant-numeric:tabular-nums;font-weight:600;font-size:17px;min-width:3ch;text-align:right}
+.badge{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--warn-bg);color:var(--warn)}
+.badge.zero{background:var(--out);color:#fff}
+.act{display:flex;gap:8px;flex-wrap:wrap;align-items:end;padding:4px 4px 14px}
+.act .qty{width:90px}
+.tx{display:grid;grid-template-columns:auto 1fr auto auto;gap:2px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.tx:first-child{border-top:0}
+.who{grid-column:2/5;font-size:12px;color:var(--muted)}
+.q{font-variant-numeric:tabular-nums;font-weight:600}
+.q.pos{color:var(--in)} .q.neg{color:var(--out)}
+.del{border:0;background:none;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:6px}
+.del.sure{background:var(--out);color:#fff}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:none;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.ctable{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ctable th{font-size:12px;color:var(--muted);font-weight:500;text-align:right;padding:6px}
+.ctable th:first-child,.ctable td:first-child{text-align:left}
+.ctable td{border-top:1px solid var(--line);padding:6px;text-align:right}
+.ctable input{width:76px;text-align:right}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+.form{border-collapse:collapse;font-family:var(--f-form);font-size:12px;color:#111;font-variant-numeric:tabular-nums;white-space:nowrap}
+.form caption{caption-side:top;text-align:center;background:#fbe3cf;color:#111;font-weight:600;padding:4px;border:1px solid #555;border-bottom:0}
+.form th{background:#e7e1f1;font-weight:400;font-size:11px;border:1px solid #555;padding:2px 4px;line-height:1.2}
+.form td{border:1px solid #555;padding:2px 4px;text-align:center;min-width:22px;background:#fff}
+.form td.n{text-align:left;min-width:110px;position:sticky;left:0;z-index:1}
+.form th.n{position:sticky;left:0;z-index:2}
+.form .y{background:#fff34d}
+.form .r,.form .low{color:#c4201a}
+.form .low{font-weight:600}
+.empty{padding:22px 8px;text-align:center;color:var(--muted)}
+.notice{border-radius:10px;padding:10px 12px;background:var(--warn-bg);color:var(--warn);font-size:14px}
+.set-head,.set-row{display:grid;grid-template-columns:1fr 80px 80px auto;gap:8px;align-items:center}
+.set-head{font-size:12px;color:var(--muted);line-height:1.25}
+.set-row{padding:6px 0;border-top:1px solid var(--line)}
+.set-row input{width:100%}
+.user{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.user:first-child{border-top:0}
+.user .nm{flex:1;min-width:0}
+.role{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--sunk)}
+.off{opacity:.55}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;max-width:calc(100% - 32px);z-index:20;text-align:center}
+#busy{position:fixed;top:0;left:0;right:0;height:3px;background:var(--accent);z-index:30;animation:bz 1s ease-in-out infinite alternate}
+@keyframes bz{from{opacity:.25}to{opacity:1}}
+/* login */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.lcard{width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;gap:18px}
+.lcard b{font-size:22px;letter-spacing:.08em}
+.dots{display:flex;justify-content:center;gap:12px;height:18px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted)}
+.dots i.f{background:var(--accent);border-color:var(--accent)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.keys button{height:58px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-size:22px;cursor:pointer;font-variant-numeric:tabular-nums}
+.keys button.go{background:var(--ok);color:var(--ok-ink);border-color:var(--ok);font-size:16px;font-weight:600}
+.keys button.ghost{background:none;border-color:transparent;font-size:15px;color:var(--muted)}
+.lerr{min-height:22px;color:var(--out);font-size:14px}
+/* booking */
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.sum .c{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.sum .c b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2}
+.sum .c span{font-size:12px;color:var(--muted)}
+.avail{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.avail span{font-size:13px;padding:3px 10px;border-radius:999px;background:var(--sunk);font-variant-numeric:tabular-nums}
+.avail span.full{background:var(--out);color:#fff}
+.bk{display:grid;grid-template-columns:52px 1fr auto;gap:2px 12px;align-items:center;padding:10px 4px;border-top:1px solid var(--line);cursor:pointer}
+.bk:first-child{border-top:0}
+.bk .t{font-variant-numeric:tabular-nums;font-weight:600}
+.bk .g{min-width:0}
+.bk .meta{grid-column:2/4;font-size:12px;color:var(--muted)}
+.pill{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--sunk);white-space:nowrap}
+.pill.in{background:var(--in);color:#fff}.pill.out{background:var(--muted);color:var(--bg)}.pill.cx{background:var(--out);color:#fff}
+.pill.ag{background:#5b3fd1;color:#fff}
+.bgrid{border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;min-width:640px;width:100%}
+.bgrid th{font-weight:500;color:var(--muted);padding:4px;border-bottom:1px solid var(--line);text-align:center}
+.bgrid{table-layout:fixed}
+.bgrid td{border:1px solid var(--line);padding:0;height:30px}
+.bgrid col.rc{width:84px}
+.bgrid td.rn{font-weight:600;padding:0 8px;min-width:56px;position:sticky;left:0;background:var(--surface);z-index:1}
+.bgrid tr.ty td{background:var(--sunk);font-weight:600;padding:3px 8px;height:auto}
+.bgrid .occ{display:block;height:100%;padding:6px;background:color-mix(in srgb,var(--accent) 18%,var(--surface));overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}
+.bgrid .occ.in{background:color-mix(in srgb,var(--in) 28%,var(--surface))}
+.bgrid td.today,.bgrid th.today{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.bform{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bform .wide{grid-column:1/-1}
+.bform select,.bform input{width:100%}
+/* tap form */
+.tf{display:flex;flex-direction:column;gap:14px}
+.tf .lbl{font-size:13px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.tf .lbl b{color:var(--ink);font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{min-width:52px;min-height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;font-variant-numeric:tabular-nums}
+.opt[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt:disabled{background:var(--sunk);color:var(--muted);border-color:transparent;cursor:not-allowed;text-decoration:line-through;opacity:.7}
+.rooms{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:520px}
+.rooms .opt{min-width:0;padding:4px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;min-height:52px}
+.rooms .opt small{font-size:11px;opacity:.75;font-weight:400}
+.rowhead{grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{display:flex;gap:8px;max-width:520px}.toggle .opt{flex:1}
+.toggle .opt.tmp[aria-pressed="true"]{background:var(--tmp);border-color:var(--tmp);color:#fff}
+.tbox{padding:12px;border-radius:10px;background:color-mix(in srgb,var(--tmp) 12%,var(--surface));display:flex;flex-direction:column;gap:10px;margin-top:10px;max-width:520px}
+.tbox input[type=time]{min-height:46px;border-radius:10px}
+.tf input[type=text].big{width:100%;max-width:520px;min-height:46px;border-radius:10px;font-size:16px}
+.calc{font-size:14px;margin-top:8px}
+.minor{margin-top:8px;padding:10px 12px;border-radius:10px;background:#b3372d;color:#fff;font-weight:600;font-size:14px}
+details.more summary{cursor:pointer;color:var(--muted);font-size:14px}
+details.more .bform{margin-top:10px}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dow{font-size:12px;color:var(--muted);text-align:center}
+.day{min-height:78px;border:1px solid var(--line);border-radius:8px;padding:4px 5px;cursor:pointer;display:flex;flex-direction:column;gap:1px;background:var(--surface);text-align:left;font-variant-numeric:tabular-nums;min-width:0}
+.day.blank{visibility:hidden;cursor:default}
+.day .d{font-size:12px;color:var(--muted)}
+.day .oc{font-size:18px;font-weight:700;line-height:1.1}.day .oc small{font-size:11px;font-weight:400;opacity:.7}
+.day .mv{font-size:11px;line-height:1.25;display:flex;gap:4px;flex-wrap:wrap}
+.mv .i{color:var(--in);font-weight:600}.mv .o{color:var(--clean);font-weight:600}.mv .t{color:var(--tmp);font-weight:600}
+.day.h1{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}.day.h2{background:color-mix(in srgb,var(--accent) 22%,var(--surface))}
+.day.h3{background:color-mix(in srgb,var(--accent) 38%,var(--surface))}.day.h4{background:color-mix(in srgb,var(--accent) 60%,var(--surface))}
+.day.today{outline:2px solid var(--accent);outline-offset:1px}.day.sel{box-shadow:inset 0 0 0 2px var(--ink)}.day.past{opacity:.55}
+.clegend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.kpi{background:var(--sunk);border-radius:10px;padding:8px 10px}.kpi b{display:block;font-size:22px;font-variant-numeric:tabular-nums;line-height:1.2}.kpi span{font-size:12px;color:var(--muted)}
+.ccols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.ccols h3{font-size:13px;margin:0 0 4px;color:var(--muted);font-weight:600}
+.li{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:14px;align-items:baseline;cursor:pointer}
+.li:first-of-type{border-top:0}.li .k{font-weight:600;min-width:42px;font-variant-numeric:tabular-nums}.li .m{color:var(--muted);font-size:12px;margin-left:auto;white-space:nowrap}
+.bars{display:flex;gap:3px;align-items:flex-end;height:110px;margin-top:6px}.bars div{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px;opacity:.8}.bars div.we{opacity:1}
+.axis{display:flex;gap:3px;font-size:10px;color:var(--muted);margin-top:2px}.axis span{flex:1;text-align:center}
+@media (max-width:520px){.day{min-height:64px;padding:3px}.day .oc{font-size:15px}.day .mv{font-size:10px;gap:2px}}
+@media (max-width:520px){.set-head,.set-row{grid-template-columns:1fr 62px 62px auto}.tx{grid-template-columns:auto 1fr auto}.tx .who{grid-column:2/4}}
+@media (prefers-reduced-motion:reduce){#busy{animation:none}}
+/* snow (ช่วงคริสต์มาส) */
+#snow{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+#snow i{position:absolute;top:-24px;color:#fff;font-style:normal;user-select:none;text-shadow:0 0 1px rgba(140,25,40,.9),0 0 5px rgba(140,25,40,.45);animation:snowfall linear infinite;will-change:transform}
+@keyframes snowfall{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(var(--sway),52vh,0) rotate(180deg)}100%{transform:translate3d(0,108vh,0) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#snow{display:none}}
+</style>
+</head>
+<body>
+<div id="busy" hidden></div>
+
+<section id="login" class="login" hidden>
+  <div class="lcard">
+    <div><b>TEEWISET</b><div class="muted small">สต๊อกของใช้ สาขาท่าเรือ</div></div>
+    <div class="muted">ใส่ PIN เพื่อเข้าใช้งาน</div>
+    <div class="dots" id="dots" aria-live="polite"></div>
+    <div class="lerr" id="lerr" role="alert"></div>
+    <div class="keys" id="keys">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button class="ghost" data-k="del">ลบ</button><button>0</button><button class="go" data-k="go">✓ เข้าใช้</button>
+    </div>
+  </div>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="bar">
+        <div class="brand"><b>TEEWISET</b><span>สาขาท่าเรือ</span></div>
+        <div class="month" aria-label="เดือน">
+          <button id="m-prev" aria-label="เดือนก่อน">‹</button>
+          <strong id="m-label">—</strong>
+          <button id="m-next" aria-label="เดือนถัดไป">›</button>
+        </div>
+      </div>
+      <div class="bar" style="padding-block:0 6px"><div class="me"><span id="me-name"></span><button class="linkbtn" id="b-refresh">รีเฟรช</button><button class="linkbtn" id="b-snow" hidden aria-label="เปิด/ปิดหิมะ">❄</button><button class="linkbtn" id="b-logout">ออกจากระบบ</button></div></div>
+      <nav class="tabs" id="tabs">
+        <button data-tab="calendar">ปฏิทิน</button>
+        <button data-tab="booking">การจอง</button>
+        <button data-tab="record">รับเข้า / เบิกออก</button>
+        <button data-tab="count">นับสต๊อก</button>
+        <button data-tab="report">ตารางประจำเดือน</button>
+        <button data-tab="settings" data-admin>ตั้งค่าสินค้า</button>
+        <button data-tab="users" data-admin>ผู้ใช้และ PIN</button>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="view"><div class="panel empty">กำลังโหลดข้อมูลสต๊อก…</div></main>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+/* เชื่อมแอปกับระบบหลังบ้านเดิม (Google Apps Script) */
+(function(){
+  var API='https://script.google.com/macros/s/AKfycbxAxdKeBiUJwkN4NvWAVmXfm3QK4s27rxCyYDZXsyDCKbEY-eV4kWNYPezH11M3eL-n/exec';
+  function runner(){var ok=function(){},fail=function(){};var o={
+    withSuccessHandler:function(f){ok=f;return o},withFailureHandler:function(f){fail=f;return o},
+    api:function(token,action,p){fetch(API,{method:'POST',body:JSON.stringify({token:token,action:action,p:p})})
+      .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(ok,fail)}};return o}
+  window.google={script:{run:new Proxy({},{get:function(_,k){return runner()[k]}})}};
+  if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+})();
+</script>
+<script>
+(function(){
+const TH_M=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const pad=n=>String(n).padStart(2,'0');
+const localToday=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const monthAdd=(m,n)=>{let [y,mo]=m.split('-').map(Number);mo+=n;while(mo>12){mo-=12;y++}while(mo<1){mo+=12;y--}return y+'-'+pad(mo)};
+const thM=m=>{const [y,mo]=m.split('-').map(Number);return TH_M[mo-1]+String((y+543)%100).padStart(2,'0')};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{if(v===''||v==null)return null;const n=Number(v);return Number.isFinite(n)?n:null};
+const sign=n=>n>0?'+'+n:String(n);
+const $=s=>document.querySelector(s);
+const view=$('#view');
+
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+const S={token:store.get('tw_token'),D:null,tab:'calendar',month:localToday().slice(0,7),date:localToday(),
+  q:'',open:null,round:'mid',dirty:false,confirmDel:null,editUser:null,pin:'',busy:0,
+  B:null,bdate:localToday(),bform:null,bloading:false,bbusy:null,
+  C:null,cmonth:localToday().slice(0,7),csel:localToday(),cloading:false};
+
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3000)}
+function busy(d){S.busy+=d;$('#busy').hidden=S.busy<=0}
+
+function call(action,p){
+  return new Promise((res,rej)=>{
+    busy(1);
+    google.script.run
+      .withSuccessHandler(r=>{busy(-1);
+        if(r&&r.ok)return res(r.data);
+        if(r&&r.auth===false){showLogin(r.error);return rej(new Error(r.error))}
+        rej(new Error((r&&r.error)||'เกิดข้อผิดพลาด ลองอีกครั้ง'))})
+      .withFailureHandler(e=>{busy(-1);rej(new Error('เชื่อมต่อไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง'))})
+      .api(S.token,action,Object.assign({month:S.month},p||{}));
+  });
+}
+async function act(action,p,okMsg){
+  try{const d=await call(action,p);apply(d);if(okMsg)toast(okMsg);return true}
+  catch(e){if(e.message)toast(e.message);return false}
+}
+function apply(d){S.D=d;S.dirty=false;render(true)}
+
+/* ---------- login ---------- */
+function showLogin(msg){
+  S.token=null;store.set('tw_token',null);S.D=null;S.pin='';
+  $('#app').hidden=true;$('#login').hidden=false;$('#lerr').textContent=msg||'';drawDots();
+}
+function drawDots(){const n=Math.max(4,S.pin.length);$('#dots').innerHTML=Array.from({length:n},(_,i)=>'<i class="'+(i<S.pin.length?'f':'')+'"></i>').join('')}
+async function doLogin(){
+  if(S.pin.length<4){$('#lerr').textContent='PIN อย่างน้อย 4 หลัก';return}
+  $('#lerr').textContent='';
+  try{const r=await call('login',{pin:S.pin});S.token=r.token;store.set('tw_token',r.token);S.pin='';
+    $('#login').hidden=true;$('#app').hidden=false;load()}
+  catch(e){S.pin='';drawDots();$('#lerr').textContent=e.message}
+}
+$('#keys').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.k==='del')S.pin=S.pin.slice(0,-1);else if(b.dataset.k==='go'){doLogin();return}else if(S.pin.length<8)S.pin+=b.textContent;
+  $('#lerr').textContent='';drawDots();if(S.pin.length===8)doLogin()});
+document.addEventListener('keydown',e=>{if($('#login').hidden)return;
+  if(/^\d$/.test(e.key)&&S.pin.length<8){S.pin+=e.key;drawDots()}else if(e.key==='Backspace'){S.pin=S.pin.slice(0,-1);drawDots()}else if(e.key==='Enter')doLogin()});
+
+/* ---------- views ---------- */
+const lv=()=>S.D?(S.D.me.level||1):0;
+const isAdmin=()=>lv()>=2;   // ผู้บริหาร และ ตำแหน่งสูง
+const isExec=()=>lv()>=3;
+const ROLE_NOTE={'ผู้บริหาร':'ทำได้ทุกอย่าง','ตำแหน่งสูง':'ตั้งค่าสินค้า ลบรายการของทุกคน จัดการผู้ใช้ระดับพนักงาน','พนักงาน':'รับ/เบิก นับสต๊อก ดูตาราง ลบได้เฉพาะของตัวเอง'};
+function isLow(it,b){return b<=0||(typeof it.min==='number'&&it.min>0&&b<=it.min)}
+function itemName(id){const it=S.D.items.find(x=>x.id===id);return it?it.name:'(ซ่อนแล้ว)'}
+
+function vRecord(){
+  const D=S.D,items=D.items;
+  if(!items.length)return '<div class="panel empty">ยังไม่มีรายการสินค้า</div>';
+  const low=items.filter(it=>isLow(it,D.bal[it.id]));
+  let h='<section class="panel"><div class="row-tools">'+
+    '<div class="field"><label for="f-date">วันที่ทำรายการ</label><input type="date" id="f-date" value="'+esc(S.date)+'"></div>'+
+    '<div class="field grow"><label for="f-q">ค้นหาสินค้า</label><input type="text" id="f-q" placeholder="เช่น ทิชชู่, น้ำยา" value="'+esc(S.q)+'"></div></div>';
+  if(low.length)h+='<div style="margin-top:12px"><div class="small muted" style="margin-bottom:6px">ใกล้หมด / หมดแล้ว '+low.length+' รายการ</div><div class="chips">'+
+    low.map(it=>'<button class="chip" data-jump="'+esc(it.id)+'">'+esc(it.name)+' · '+D.bal[it.id]+'</button>').join('')+'</div></div>';
+  h+='</section><section class="panel"><h2>คงเหลือตอนนี้ <span class="small muted" style="font-weight:400">แตะชื่อสินค้าเพื่อรับเข้าหรือเบิกออก</span></h2><div id="ilist">';
+  const ql=S.q.trim().toLowerCase();
+  for(const it of items){const b=D.bal[it.id];
+    h+='<div class="item" data-name="'+esc(it.name.toLowerCase())+'"'+(ql&&!it.name.toLowerCase().includes(ql)?' hidden':'')+'>'+
+      '<button data-open="'+esc(it.id)+'" aria-expanded="'+(S.open===it.id)+'"><span class="nm">'+esc(it.name)+'</span>'+
+      (isLow(it,b)?'<span class="badge'+(b<=0?' zero':'')+'">'+(b<=0?'หมด':'ใกล้หมด')+'</span>':'')+'<span class="bal">'+b+'</span></button>';
+    if(S.open===it.id)h+='<div class="act"><div class="field"><label for="f-qty">จำนวน</label><input type="number" id="f-qty" class="qty" min="1" inputmode="numeric" value="1"></div>'+
+      '<div class="field grow"><label for="f-note">หมายเหตุ (ไม่บังคับ)</label><input type="text" id="f-note" placeholder="เช่น ห้อง 204"></div>'+
+      '<button class="btn in" data-do="in">รับเข้า +</button><button class="btn out" data-do="out">เบิกออก −</button></div>';
+    h+='</div>'}
+  h+='</div></section><section class="panel"><h2>รายการของเดือน '+thM(D.month)+'</h2>';
+  if(!D.tx.length)h+='<div class="empty small">ยังไม่มีรายการในเดือนนี้</div>';
+  else{const mo=TH_M[Number(D.month.slice(5))-1];
+    h+=D.tx.map(t=>{const mine=isAdmin()||t.by===D.me.name;
+      return '<div class="tx"><span class="small muted">'+t.day+' '+mo+'</span><span>'+esc(itemName(t.i))+(t.note?' <span class="small muted">· '+esc(t.note)+'</span>':'')+'</span>'+
+      '<span class="q '+(t.q>0?'pos':'neg')+'">'+sign(t.q)+'</span>'+
+      (mine?'<button class="del'+(S.confirmDel===t.id?' sure':'')+'" data-del="'+esc(t.id)+'">'+(S.confirmDel===t.id?'ยืนยันลบ':'ลบ')+'</button>':'<span></span>')+
+      '<span class="who">โดย '+esc(t.by)+' · '+esc(t.at.slice(11,16))+'</span></div>'}).join('')}
+  return h+'</section>';
+}
+
+function beforeStart(){return '<div class="panel empty">เดือนนี้อยู่ก่อนเดือนเริ่มต้นของระบบ ('+thM(S.D.start)+')</div>'}
+
+function vCount(){
+  const D=S.D;if(!D.rows)return beforeStart();
+  const saved=D.counts[S.round]||{};
+  let h='<section class="panel"><div class="row-tools" style="justify-content:space-between;align-items:center">'+
+    '<div><h2 style="margin:0">นับสต๊อก '+thM(D.month)+'</h2><div class="small muted">กรอกจำนวนที่นับได้จริง ระบบคำนวณของหายหรือเกินให้</div></div>'+
+    '<div class="seg" role="group"><button data-round="mid" aria-pressed="'+(S.round==='mid')+'">กลางเดือน (วันที่ 16)</button><button data-round="end" aria-pressed="'+(S.round==='end')+'">สิ้นเดือน</button></div></div>'+
+    '<div style="overflow-x:auto;margin-top:10px"><table class="ctable"><thead><tr><th>รายการ</th><th>ระบบคำนวณ</th><th>นับได้</th><th>หาย / เกิน</th></tr></thead><tbody>';
+  for(const it of D.items){const r=D.rows[it.id];if(!r)continue;
+    const exp=S.round==='mid'?r.cMid:r.cEnd;const v=typeof saved[it.id]==='number'?saved[it.id]:'';const d=v===''?null:v-exp;
+    h+='<tr><td>'+esc(it.name)+'</td><td>'+exp+'</td><td><input type="number" inputmode="numeric" id="c-'+esc(it.id)+'" data-c="'+esc(it.id)+'" data-exp="'+exp+'" value="'+v+'"></td>'+
+      '<td class="q '+(d<0?'neg':d>0?'pos':'')+'" data-d="'+esc(it.id)+'">'+(d==null?'':d===0?'ตรง':sign(d))+'</td></tr>'}
+  return h+'</tbody></table></div><div class="row-tools" style="margin-top:12px"><span class="small muted grow">ช่องที่เว้นว่างจะใช้ยอดที่ระบบคำนวณ</span><button class="btn ok" id="c-save">บันทึกยอดนับ</button></div></section>';
+}
+
+function reportTable(){
+  const D=S.D;let h='<table class="form"><caption>การเบิกของ'+thM(D.month)+' ท่าเรือ</caption><thead><tr><th class="n">รายการ</th><th>ยอดยกมา</th>';
+  for(let d=1;d<=15;d++)h+='<th>'+d+'</th>';
+  h+='<th class="y">16/ยอด<br>ยกไป</th>';for(let d=16;d<=31;d++)h+='<th>'+d+'</th>';
+  h+='<th>รวมเข้า</th><th>รวมเบิก</th><th>หาย/<br>เกิน</th><th>คงเหลือ/<br>ยอดยกไป</th></tr></thead><tbody>';
+  const cell=v=>!v?'<td></td>':'<td'+(v<0?' class="r"':'')+'>'+v+'</td>';
+  for(const it of D.items){const r=D.rows[it.id];if(!r)continue;
+    h+='<tr><td class="n">'+esc(it.name)+'</td><td>'+r.open+'</td>';
+    for(let d=1;d<=15;d++)h+=cell(r.days[d]);
+    h+='<td class="y">'+r.mid+'</td>';
+    for(let d=16;d<=31;d++)h+=cell(r.days[d]);
+    h+='<td>'+(r.sumIn||'')+'</td><td>'+(r.sumOut||'')+'</td><td'+(r.diff<0?' class="r"':'')+'>'+(r.diff?sign(r.diff):'')+'</td><td'+(isLow(it,r.end)?' class="low"':'')+'>'+r.end+'</td></tr>'}
+  return h+'</tbody></table>';
+}
+function vReport(){
+  if(!S.D.rows)return beforeStart();
+  return '<section class="panel"><div class="row-tools" style="justify-content:space-between;align-items:center"><div class="grow"><h2 style="margin:0">ตารางประจำเดือน '+thM(S.D.month)+'</h2>'+
+    '<div class="small muted">รูปแบบเดียวกับใบที่ส่งผู้จัดการ เลขแดงคือเบิกออก ช่องเหลืองคือยอดกลางเดือน</div></div>'+
+    '<button class="btn" id="r-sheet">สร้างตารางใน Google Sheets</button><button class="btn primary" id="r-print">พิมพ์ / บันทึก PDF</button></div></section>'+
+    '<div class="scroll">'+reportTable()+'</div>';
+}
+
+function vSettings(){
+  const D=S.D;
+  let h='<section class="panel"><h2>เดือนเริ่มต้นและยอดยกมา</h2><div class="row-tools"><div class="field"><label for="s-start">เริ่มใช้ระบบเดือน</label><input type="month" id="s-start" value="'+esc(D.start)+'"></div>'+
+    '<p class="small muted grow" style="margin:0">ใส่ “ยอดยกมา” ของเดือนเริ่มต้น เดือนต่อไประบบยกยอดให้เอง “แจ้งเตือนเมื่อเหลือ” คือจำนวนที่ถือว่าใกล้หมด</p></div></section>'+
+    '<section class="panel"><h2>รายการสินค้า ('+D.items.length+')</h2><div class="set-head"><span>ชื่อสินค้า</span><span>ยอดยกมา<br>'+thM(D.start)+'</span><span>แจ้งเตือน<br>เมื่อเหลือ</span><span></span></div>';
+  for(const it of D.items)
+    h+='<div class="set-row"><input type="text" id="sn-'+esc(it.id)+'" value="'+esc(it.name)+'" aria-label="ชื่อสินค้า">'+
+      '<input type="number" inputmode="numeric" id="so-'+esc(it.id)+'" value="'+it.open+'" aria-label="ยอดยกมา">'+
+      '<input type="number" inputmode="numeric" id="sm-'+esc(it.id)+'" value="'+(typeof it.min==='number'?it.min:'')+'" placeholder="—" aria-label="แจ้งเตือนเมื่อเหลือ">'+
+      '<button class="del'+(S.confirmDel==='i/'+it.id?' sure':'')+'" data-hide="'+esc(it.id)+'">'+(S.confirmDel==='i/'+it.id?'ยืนยัน':'ซ่อน')+'</button></div>';
+  return h+'<div class="row-tools" style="margin-top:12px"><div class="field grow"><label for="s-new">เพิ่มสินค้าใหม่</label><input type="text" id="s-new" placeholder="ชื่อสินค้า"></div><button class="btn" id="s-add">เพิ่ม</button></div>'+
+    '<div class="row-tools" style="margin-top:12px;justify-content:flex-end"><button class="btn ok" id="s-save">บันทึกการตั้งค่า</button></div></section>';
+}
+
+function userForm(u){
+  const isNew=!u;u=u||{name:'',role:'พนักงาน',active:true};
+  return '<div class="panel" style="background:var(--sunk);margin-top:8px"><div class="row-tools">'+
+    '<div class="field grow"><label for="u-name">ชื่อ</label><input type="text" id="u-name" value="'+esc(u.name)+'"></div>'+
+    '<div class="field"><label for="u-pin">'+(isNew?'PIN (4–8 หลัก)':'PIN ใหม่ (เว้นว่าง = ใช้ PIN เดิม)')+'</label><input type="password" inputmode="numeric" id="u-pin" autocomplete="new-password"></div>'+
+    '<div class="field"><label for="u-title">ตำแหน่ง</label><input type="text" id="u-title" placeholder="เช่น ผู้จัดการ, ฟร้อน" value="'+esc(u.title||'')+'"></div>'+
+    '<div class="field"><label for="u-role">ระดับสิทธิ์</label><select id="u-role">'+
+      (isExec()?['พนักงาน','ตำแหน่งสูง','ผู้บริหาร']:['พนักงาน']).map(r=>'<option'+(u.role===r?' selected':'')+'>'+r+'</option>').join('')+'</select></div>'+
+    (isNew?'':'<div class="field"><label for="u-active">สถานะ</label><select id="u-active"><option value="1"'+(u.active?' selected':'')+'>ใช้งาน</option><option value="0"'+(u.active?'':' selected')+'>ปิดการใช้งาน</option></select></div>')+
+    '<button class="btn" data-ucancel>ยกเลิก</button><button class="btn ok" id="u-save" data-old="'+esc(isNew?'':u.name)+'">บันทึก</button></div></div>';
+}
+function vUsers(){
+  const us=S.D.users||[];
+  let h='<section class="panel"><h2>ผู้ใช้และ PIN</h2><div class="small muted" style="margin:0 0 8px;display:grid;gap:2px">'+
+    ['ผู้บริหาร','ตำแหน่งสูง','พนักงาน'].map(r=>'<span><b>'+r+'</b>: '+ROLE_NOTE[r]+'</span>').join('')+
+    '<span>เปลี่ยน PIN หรือปิดการใช้งาน จะทำให้คนนั้นต้องเข้าระบบใหม่ทุกเครื่อง</span></div>';
+  const order={'ผู้บริหาร':0,'ตำแหน่งสูง':1,'พนักงาน':2};
+  for(const u of us.slice().sort((a,b)=>order[a.role]-order[b.role])){
+    const can=isExec()||u.role==='พนักงาน';
+    h+='<div class="user'+(u.active?'':' off')+'"><span class="nm">'+esc(u.name)+(u.title?' <span class="small muted">· '+esc(u.title)+'</span>':'')+(u.name===S.D.me.name?' <span class="small muted">(คุณ)</span>':'')+'</span><span class="role">'+esc(u.role)+'</span>'+
+      (u.active?'':'<span class="small muted">ปิดใช้งาน</span>')+(can?'<button class="btn" data-uedit="'+esc(u.name)+'">แก้ไข</button>':'')+'</div>';
+    if(S.editUser===u.name)h+=userForm(u);
+  }
+  h+=S.editUser==='__new'?userForm(null):'<div class="row-tools" style="margin-top:10px"><button class="btn primary" data-uedit="__new">เพิ่มผู้ใช้</button></div>';
+  return h+'</section>';
+}
+
+/* ---------- booking ---------- */
+const WD=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+const dAdd=(d,n)=>{const t=new Date(Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10))+n*864e5);return t.toISOString().slice(0,10)};
+const dShort=d=>{const t=new Date(Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10)));return WD[t.getUTCDay()]+' '+(+d.slice(8,10))+'/'+(+d.slice(5,7))};
+const dLong=d=>(+d.slice(8,10))+' '+TH_M[+d.slice(5,7)-1]+' '+String((+d.slice(0,4)+543)%100);
+const live=b=>b.status!=='ยกเลิก';
+const onNight=(b,d)=>b.cin<=d&&d<b.cout;
+function stPill(b){const c={'เช็คอินแล้ว':'in','เช็คเอาท์แล้ว':'out','ยกเลิก':'cx'}[b.status]||'';return '<span class="pill '+c+'">'+esc(b.status)+'</span>'}
+function chPill(b){return '<span class="pill'+(b.channel==='Agoda'?' ag':'')+'">'+esc(b.channel)+'</span>'}
+function freeOn(type,d){const B=S.B;const cap=(B.types.find(t=>t.type===type)||{}).count||0;return cap-B.bookings.filter(b=>live(b)&&b.type===type&&onNight(b,d)).length}
+function roomBusy(no,cin,cout,selfId){return S.B.bookings.find(b=>live(b)&&b.room===no&&b.id!==selfId&&b.cin<cout&&cin<b.cout)}
+
+function bkRow(b,lead){
+  return '<div class="bk" data-bk="'+esc(b.id)+'"><span class="t">'+esc(lead||'')+'</span><span class="g"><b>'+esc(b.guest)+'</b> · '+b.pax+' ท่าน</span><span>'+stPill(b)+'</span>'+
+    '<span class="meta">'+esc(b.room?'ห้อง '+b.room:'ยังไม่ระบุเลขห้อง')+' · '+esc(b.type)+' · '+(b.kind==='temp'?'ชั่วคราว '+esc(b.eta)+'–'+esc(b.tout||''):dLong(b.cin)+' → '+dLong(b.cout))+(b.age?' · '+esc(b.age):'')+' · '+chPill(b)+(b.note?' · '+esc(b.note):'')+'</span></div>';
+}
+
+const TP={'ห้อง 550':200,'ห้อง 750':300,'ห้อง 850':350,'ห้อง 950':400};
+function roomInfo(no){return (S.B&&S.B.rooms.find(r=>r.no===no))||null}
+function hhmmAdd(t,h){if(!t)return '';const [H,M]=t.split(':').map(Number);const m=((H*60+M+h*60)%1440+1440)%1440;return pad(Math.floor(m/60))+':'+pad(m%60)}
+function fNights(f){return Math.max(1,Math.round((Date.parse(f.cout)-Date.parse(f.cin))/864e5)||1)}
+function chipRow(list,key,fmt,extra){const f=S.bform;return '<div class="opts">'+list.map(v=>'<button class="opt" data-f="'+key+'" data-v="'+esc(v)+'" aria-pressed="'+(String(f[key])===String(v))+'"'+(extra?extra(v):'')+'>'+(fmt?fmt(v):esc(v))+'</button>').join('')+'</div>'}
+function bookingForm(){
+  const B=S.B,f=S.bform,isNew=!f.id,temp=f.kind==='temp',today=B.today;
+  const ri=f.room?roomInfo(f.room):null;
+  let h='<section class="panel" id="bform-panel"><h2>'+(isNew?'เพิ่มการจอง':'การจองของ '+esc(f.guest)+' '+stPill(f))+'</h2><div class="tf">';
+  h+='<div><div class="lbl"><b>ชื่อแขก</b></div><input type="text" class="big" id="f-guest" value="'+esc(f.guest||'')+'" placeholder="เช่น คุณสมชาย"></div>';
+  h+='<div><div class="lbl"><b>จำนวนท่าน</b></div>'+chipRow([1,2,3],'pax',v=>v+' ท่าน')+
+     '<div class="lbl" style="margin-top:12px"><b>อายุลูกค้า</b><span>ผู้จองหลัก</span></div>'+chipRow(['ต่ำกว่า 20'].concat(B.ages||[]),'age')+
+     (f.age==='ต่ำกว่า 20'?'<div class="minor">ไม่รับเข้าพัก ลูกค้าอายุต่ำกว่า 20 ปี</div>':'')+'</div>';
+  h+='<div><div class="toggle"><button class="opt" data-f="kind" data-v="day" aria-pressed="'+(!temp)+'">รายวัน (ค้างคืน)</button><button class="opt tmp" data-f="kind" data-v="temp" aria-pressed="'+temp+'">ชั่วคราว</button></div>';
+  if(temp){
+    h+='<div class="tbox"><div class="lbl" style="margin:0"><b>วันที่</b></div>'+chipRow([today,dAdd(today,1)],'cin',v=>v===today?'วันนี้':'พรุ่งนี้')+
+      '<div class="lbl" style="margin:0"><b>เวลาเข้า</b></div><div class="opts"><button class="opt" data-fnow>ตอนนี้</button><input type="time" id="f-eta" value="'+esc(f.eta||'')+'"></div>'+
+      '<div class="lbl" style="margin:0"><b>อยู่กี่ชั่วโมง</b></div>'+chipRow([2,3,4,5],'hrs',v=>v+' ชม.')+
+      '<div class="lbl" style="margin:0"><b>เวลาออก</b><span>คิดให้เอง แก้ได้</span></div><div class="opts"><input type="time" id="f-tout" value="'+esc(f.tout||'')+'"></div></div>';
+  }
+  h+='</div>';
+  // rooms
+  const busy=S.bbusy||[];
+  let rg='';['A','B'].forEach(w=>{rg+='<div class="rowhead">ห้องฝั่ง '+w+'</div>';B.rooms.filter(r=>r.no[0]===w).forEach(r=>{const bz=busy.indexOf(r.no)>=0&&r.no!==f.room;
+    rg+='<button class="opt" data-room="'+esc(r.no)+'" aria-pressed="'+(f.room===r.no)+'"'+(bz?' disabled':'')+'>'+esc(r.no)+'<small>'+(temp?(r.tprice||TP[r.type]||''):r.price)+'</small></button>'})});
+  h+='<div><div class="lbl"><b>เลือกห้อง</b><span>'+(S.bbusy===null?'กำลังเช็กห้องว่าง…':ri?'ห้อง '+esc(ri.no)+' · '+(temp?(ri.tprice||TP[ri.type])+' บาท (ชั่วคราว)':ri.price+' บาท/คืน'):'ห้องสีเทา = ไม่ว่าง')+'</span></div><div class="rooms">'+rg+'</div></div>';
+  if(!temp){
+    const ds=[today,dAdd(today,1),dAdd(today,2)];
+    h+='<div><div class="lbl"><b>เข้าวันที่</b></div>'+chipRow(ds,'cin',v=>v===today?'วันนี้':v===ds[1]?'พรุ่งนี้':dShort(v))+
+       '<div class="opts" style="margin-top:8px"><input type="date" id="f-pick" value="'+(ds.indexOf(f.cin)<0?esc(f.cin||''):'')+'" aria-label="เลือกวันเข้าเอง"></div>'+
+       '<div class="lbl" style="margin-top:12px"><b>กี่คืน</b></div>'+chipRow([1,2,3,4,5,7],'nights')+
+       '<div class="calc">เข้า <b>'+dShort(f.cin)+'</b> → ออก <b>'+dShort(f.cout)+'</b> ('+fNights(f)+' คืน)'+(ri?' · รวม <b>'+(ri.price*fNights(f)).toLocaleString()+'</b> บาท':'')+'</div>'+
+       '<div class="lbl" style="margin-top:12px"><b>เวลามาถึงโดยประมาณ</b><span>ไม่บังคับ</span></div><div class="opts"><input type="time" id="f-eta" value="'+esc(f.eta||'')+'"></div></div>';
+  }
+  h+='<div><div class="lbl"><b>ช่องทาง</b></div>'+chipRow(B.channels.filter(c=>c!=='อื่นๆ'),'channel')+'</div>';
+  h+='<details class="more"'+(f.phone||f.ref||f.note?' open':'')+'><summary>เพิ่มเติม: เบอร์โทร เลขจอง หมายเหตุ</summary><div class="bform">'+
+    '<div class="field"><label for="f-phone">เบอร์โทร</label><input type="text" id="f-phone" inputmode="tel" value="'+esc(f.phone||'')+'"></div>'+
+    '<div class="field"><label for="f-ref">เลขจอง (ถ้ามี)</label><input type="text" id="f-ref" value="'+esc(f.ref||'')+'"></div>'+
+    '<div class="field wide"><label for="f-note">หมายเหตุ</label><input type="text" id="f-note" placeholder="เช่น ขอเตียงเสริม, จ่ายแล้ว" value="'+esc(f.note||'')+'"></div></div></details>';
+  h+='</div><div class="row-tools" style="margin-top:14px">';
+  if(!isNew){
+    if(f.status==='จอง')h+='<button class="btn in" data-bst="checkin">เช็คอินแล้ว</button>';
+    if(f.status==='จอง'||f.status==='เช็คอินแล้ว')h+='<button class="btn" data-bst="checkout">เช็คเอาท์แล้ว</button>';
+    if(f.status!=='จอง'&&(f.status!=='ยกเลิก'||isAdmin()))h+='<button class="btn" data-bst="reset">คืนเป็น "จอง"</button>';
+    if(f.status!=='ยกเลิก'&&isAdmin())h+='<button class="del'+(S.confirmDel==='b/'+f.id?' sure':'')+'" data-bst="cancel">'+(S.confirmDel==='b/'+f.id?'ยืนยันยกเลิกการจอง':'ยกเลิกการจอง')+'</button>';
+  }
+  const miss=formMissing();
+  h+='<span class="grow small muted">'+(miss.length?'ยังขาด: '+miss.join(', '):'')+'</span><button class="btn" data-bclose>ปิด</button><button class="btn ok" id="b-save"'+(miss.length?' disabled':'')+'>บันทึก</button></div>';
+  if(!isNew)h+='<div class="small muted" style="margin-top:8px">บันทึกโดย '+esc(f.by)+' · '+esc(f.at)+(f.inAt?' · เช็คอิน '+esc(f.inAt):'')+(f.outAt?' · เช็คเอาท์ '+esc(f.outAt):'')+'</div>';
+  return h+'</section>';
+}
+function formMissing(){const f=S.bform,m=[];if(!(f.guest||'').trim())m.push('ชื่อแขก');if(!f.age)m.push('อายุ');if(f.age==='ต่ำกว่า 20')m.push('อายุต่ำกว่า 20 ไม่รับเข้าพัก');
+  if(!f.room)m.push('ห้อง');if(f.kind==='temp'&&(!f.eta||!f.tout))m.push('เวลาเข้า-ออก');if(!f.channel)m.push('ช่องทาง');return m}
+let busyT=null,busySeq=0;
+function fetchBusy(){const f=S.bform;if(!f)return;S.bbusy=null;clearTimeout(busyT);const seq=++busySeq;
+  busyT=setTimeout(async()=>{try{const r=await call('busyRooms',{q:{kind:f.kind,cin:f.cin,cout:f.cout,eta:f.eta,tout:f.tout,id:f.id||''}});if(seq===busySeq&&S.bform){S.bbusy=r;if(f.room&&r.indexOf(f.room)>=0&&f.room!==f.origRoom){f.room='';toast('ห้องที่เลือกไม่ว่างแล้ว เลือกห้องใหม่')}render(true)}}catch(e){if(seq===busySeq){S.bbusy=[];render(true)}}},250);}
+function newForm(){const d=S.B?S.B.date:localToday();S.bform={kind:'day',guest:'',pax:2,age:'',cin:d<localToday()?localToday():d,cout:'',nights:1,eta:'',tout:'',hrs:3,room:'',channel:'Walk-in',phone:'',ref:'',note:''};
+  S.bform.cout=dAdd(S.bform.cin,1);S.confirmDel=null;fetchBusy();}
+function setF(k,v){const f=S.bform;
+  if(k==='pax'||k==='nights'||k==='hrs')v=+v;
+  f[k]=v;
+  if(k==='kind'){if(v==='temp'){f.cin=f.cin>dAdd(S.B.today,1)||f.cin<S.B.today?S.B.today:f.cin;f.cout=f.cin}else{f.cout=dAdd(f.cin,f.nights||1)}fetchBusy()}
+  if(k==='cin'){f.cout=f.kind==='temp'?v:dAdd(v,f.nights||1);fetchBusy()}
+  if(k==='nights'){f.cout=dAdd(f.cin,v);fetchBusy()}
+  if(k==='hrs'&&f.eta){f.tout=hhmmAdd(f.eta,v);fetchBusy()}
+  render(true);}
+function openBooking(id,src){const list=(src||S.B).bookings;const b=list.find(x=>x.id===id);if(!b)return;
+  if(src&&S.tab!=='booking'){S.tab='booking';S.bdate=b.cin;S.B=null;S.pendingOpen=id;render(true);return}
+  S.bform=Object.assign({hrs:3},b);S.bform.origRoom=b.room;S.bform.nights=fNights(b);if(b.kind!=='temp'&&!(b.cout>b.cin))S.bform.cout=dAdd(b.cin,1);
+  S.confirmDel=null;fetchBusy();render(true);const p=$('#bform-panel');if(p)p.scrollIntoView({block:'start'})}
+function readForm(){const f=S.bform,ri=f.room?roomInfo(f.room):null;return{id:f.id||'',kind:f.kind,guest:f.guest,pax:f.pax,age:f.age,cin:f.cin,cout:f.kind==='temp'?f.cin:f.cout,
+  eta:f.eta,tout:f.kind==='temp'?f.tout:'',room:f.room,type:ri?ri.type:f.type,channel:f.channel,phone:f.phone,ref:f.ref,note:f.note}}
+
+/* ---------- calendar ---------- */
+const DOW=['อา','จ','อ','พ','พฤ','ศ','ส'],TH_FULL=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const wday=d=>new Date(Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10))).getUTCDay();
+function cstat(d){const L=S.C.bookings,day=L.filter(b=>b.kind!=='temp');
+  return{arr:day.filter(b=>b.cin===d),dep:day.filter(b=>b.cout===d),stay:day.filter(b=>b.cin<=d&&d<b.cout),temp:L.filter(b=>b.kind==='temp'&&b.cin===d)}}
+function cli(b,k,main,meta){return '<div class="li" data-cbk="'+esc(b.id)+'"><span class="k">'+esc(k)+'</span><span>'+main+'</span><span class="m">'+meta+'</span></div>'}
+function vCalendar(){
+  const C=S.C;if(!C||C.month!==S.cmonth)return '<div class="panel empty">กำลังโหลดปฏิทิน…</div>';
+  const [y,m]=C.month.split('-').map(Number),first=C.month+'-01',lead=wday(first),rc=C.roomCount||20;
+  let h='<section class="panel"><h2 style="display:flex;align-items:center;gap:8px"><button class="btn" data-cm="-1" aria-label="เดือนก่อน">‹</button><span style="min-width:120px;text-align:center">'+TH_FULL[m-1]+' '+(y+543)+'</span><button class="btn" data-cm="1" aria-label="เดือนถัดไป">›</button>'+
+    (C.month!==C.today.slice(0,7)?'<button class="btn" data-cm="0">เดือนนี้</button>':'')+'</h2><div class="cal">'+DOW.map(w=>'<div class="dow">'+w+'</div>').join('');
+  for(let i=0;i<lead;i++)h+='<div class="day blank"></div>';
+  for(let i=1;i<=C.days;i++){const d=C.month+'-'+pad(i),s=cstat(d),o=s.stay.length,r=o/rc,lv=o===0?0:r<=.25?1:r<=.5?2:r<=.75?3:4;
+    h+='<button class="day h'+lv+(d===C.today?' today':'')+(d===S.csel?' sel':'')+(d<C.today?' past':'')+'" data-cd="'+d+'"><span class="d">'+i+'</span><span class="oc">'+o+'<small>/'+rc+'</small></span><span class="mv">'+
+      (s.arr.length?'<span class="i">เข้า'+s.arr.length+'</span>':'')+(s.dep.length?'<span class="o">ออก'+s.dep.length+'</span>':'')+(s.temp.length?'<span class="t">ชค.'+s.temp.length+'</span>':'')+'</span></button>'}
+  h+='</div><div class="clegend"><span>ตัวเลขใหญ่ = ห้องมีแขกคืนนั้น · กรอบแดง = วันนี้</span><span><b class="mv"><span class="i">เข้า</span></b> เตรียมห้อง · <b class="mv"><span class="o">ออก</span></b> ทำความสะอาด · <b class="mv"><span class="t">ชค.</span></b> ชั่วคราว</span><span>สียิ่งเข้มยิ่งแน่น</span></div></section>';
+  // day detail
+  const d=S.csel.slice(0,7)===C.month?S.csel:(C.month===C.today.slice(0,7)?C.today:first),s=cstat(d),pax=s.arr.reduce((a,b)=>a+b.pax,0);
+  h+='<section class="panel"><h2>'+(d===C.today?'วันนี้ · ':'')+['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'][wday(d)]+' '+dLong(d)+' <span class="small muted" style="font-weight:400">แตะวันอื่นในปฏิทินเพื่อดู</span></h2>'+
+    '<div class="kpis"><div class="kpi"><b>'+s.arr.length+'</b><span>ห้องเข้า ('+pax+' ท่าน)</span></div><div class="kpi"><b>'+s.dep.length+'</b><span>ห้องออก = ทำความสะอาด</span></div>'+
+    '<div class="kpi"><b>'+s.stay.length+'/'+rc+'</b><span>มีแขกคืนนี้</span></div><div class="kpi"><b>'+s.temp.length+'</b><span>ชั่วคราว</span></div></div><div class="ccols">';
+  h+='<div><h3>เตรียมห้องรับแขก (เรียงตามเวลา)</h3>'+(s.arr.length?s.arr.slice().sort((a,b)=>(a.eta||'99').localeCompare(b.eta||'99')).map(b=>cli(b,b.eta||'—',esc(b.room||'ยังไม่ระบุห้อง')+' · '+esc(b.guest),b.pax+' ท่าน · '+Math.max(1,Math.round((Date.parse(b.cout)-Date.parse(b.cin))/864e5))+' คืน')).join(''):'<div class="empty small">ไม่มี</div>')+'</div>';
+  h+='<div><h3>ทำความสะอาดหลังแขกออก</h3>'+(s.dep.length?s.dep.map(b=>cli(b,b.room||'—',esc(b.guest),esc(b.status))).join(''):'<div class="empty small">ไม่มี</div>')+'</div>';
+  h+='<div><h3>ชั่วคราว</h3>'+(s.temp.length?s.temp.slice().sort((a,b)=>(a.eta||'').localeCompare(b.eta||'')).map(b=>cli(b,b.eta||'—',esc(b.room||'—')+' · '+esc(b.guest),'ถึง '+esc(b.tout||''))).join(''):'<div class="empty small">ไม่มี</div>')+'</div>';
+  h+='</div></section>';
+  // revenue (server only sends it to ผู้บริหาร)
+  if(C.revenue){const R=C.revenue,max=Math.max(1,...R.perDay);
+    h+='<section class="panel"><h2>รายได้ '+TH_FULL[m-1]+' <span class="small muted" style="font-weight:400">เห็นเฉพาะผู้บริหาร</span></h2><div class="kpis">'+
+      '<div class="kpi"><b>'+R.total.toLocaleString()+'</b><span>รายได้รวม (บาท)</span></div><div class="kpi"><b>'+R.day.toLocaleString()+'</b><span>รายวัน</span></div>'+
+      '<div class="kpi"><b>'+R.temp.toLocaleString()+'</b><span>ชั่วคราว</span></div><div class="kpi"><b>'+R.occ+'%</b><span>อัตราเข้าพัก ('+R.roomNights+' ห้อง-คืน)</span></div></div>'+
+      '<div class="bars">'+R.perDay.map((v,i)=>{const dd=C.month+'-'+pad(i+1);return '<div class="'+([5,6].includes(wday(dd))?'we':'')+'" style="height:'+Math.round(v/max*100)+'%" title="'+(i+1)+' '+TH_M[m-1]+' · '+v.toLocaleString()+' บาท"></div>'}).join('')+'</div>'+
+      '<div class="axis">'+R.perDay.map((v,i)=>'<span>'+((i+1)%5===1?i+1:'')+'</span>').join('')+'</div><p class="small muted" style="margin:8px 0 0">คิดจากการจองที่บันทึกไว้ ไม่รวมที่ยกเลิก</p></section>';}
+  return h;
+}
+async function loadC(){S.cloading=true;try{const r=await call('calendar',{cal:S.cmonth});S.C=r;if(S.tab==='calendar')render(true)}catch(e){if(e.message)toast(e.message)}finally{S.cloading=false}}
+
+function vBooking(){
+  const B=S.B;
+  if(!B)return '<div class="panel empty">กำลังโหลดการจอง…</div>';
+  const d=B.date,all=B.bookings.filter(live),list=all.filter(b=>b.kind!=='temp'),temps=all.filter(b=>b.kind==='temp'&&b.cin===d).sort((a,b)=>(a.eta||'').localeCompare(b.eta||''));
+  const arr=list.filter(b=>b.cin===d).sort((a,b)=>(a.eta||'99').localeCompare(b.eta||'99'));
+  const dep=list.filter(b=>b.cout===d);
+  const stay=list.filter(b=>b.cin<d&&d<b.cout);
+  const night=list.filter(b=>onNight(b,d));
+  const total=B.rooms.length,pax=night.reduce((s,b)=>s+b.pax,0);
+  let h='<section class="panel"><div class="row-tools" style="align-items:center">'+
+    '<button class="btn" data-bday="-1" aria-label="วันก่อน">‹</button>'+
+    '<div class="field"><label for="b-date">วันที่</label><input type="date" id="b-date" value="'+esc(d)+'"></div>'+
+    '<button class="btn" data-bday="1" aria-label="วันถัดไป">›</button>'+
+    (d!==B.today?'<button class="btn" data-btoday>วันนี้</button>':'')+
+    '<span class="grow"></span><button class="btn primary" data-bnew>+ เพิ่มการจอง</button></div></section>';
+  if(S.bform)h+=bookingForm();
+  h+='<div class="sum">'+
+    '<div class="c"><b>'+arr.length+'</b><span>เช็คอิน '+(d===B.today?'วันนี้':dLong(d))+' ('+arr.reduce((s,b)=>s+b.pax,0)+' ท่าน)</span></div>'+
+    '<div class="c"><b>'+dep.length+'</b><span>เช็คเอาท์ '+(d===B.today?'วันนี้':dLong(d))+'</span></div>'+
+    '<div class="c"><b>'+night.length+'/'+total+'</b><span>ห้องมีแขกคืนนี้ ('+pax+' ท่าน)</span></div>'+
+    '<div class="c"><b>'+(total-night.length)+'</b><span>ห้องว่างคืนนี้</span></div></div>'+
+    '<div class="avail">'+B.types.map(t=>{const f=freeOn(t.type,d);return '<span class="'+(f<=0?'full':'')+'">'+esc(t.type)+' ว่าง '+f+'/'+t.count+'</span>'}).join('')+'</div>';
+  const sec=(title,rows,lead)=>'<section class="panel"><h2>'+title+' ('+rows.length+')</h2>'+(rows.length?rows.map(b=>bkRow(b,lead(b))).join(''):'<div class="empty small">ไม่มี</div>')+'</section>';
+  h+=sec('เช็คอิน'+(d===B.today?'วันนี้':' '+dLong(d)),arr,b=>b.eta||'—');
+  h+=sec('เช็คเอาท์'+(d===B.today?'วันนี้':' '+dLong(d)),dep,b=>b.room||'—');
+  h+=sec('พักต่อ',stay,b=>b.room||'—');
+  h+=sec('ชั่วคราว'+(d===B.today?'วันนี้':' '+dLong(d)),temps,b=>b.eta||'—');
+  // 7-day room grid
+  const days=Array.from({length:7},(_,i)=>dAdd(d,i));
+  let g='<section class="panel"><h2>ผังห้อง 7 วัน</h2><div style="overflow-x:auto"><table class="bgrid"><colgroup><col class="rc">'+days.map(()=>'<col>').join('')+'</colgroup><thead><tr><th></th>'+days.map(x=>'<th class="'+(x===B.today?'today':'')+'">'+dShort(x)+'</th>').join('')+'</tr></thead><tbody>';
+  for(const t of B.types){
+    g+='<tr class="ty"><td class="rn">'+esc(t.type)+'</td>'+days.map(x=>{const f=freeOn(t.type,x);return '<td style="text-align:center'+(f<0?';color:var(--out)':'')+'">ว่าง '+f+'</td>'}).join('')+'</tr>';
+    for(const r of B.rooms.filter(r=>r.type===t.type)){
+      g+='<tr><td class="rn">'+esc(r.no)+'</td>'+days.map(x=>{const b=list.find(b=>b.room===r.no&&onNight(b,x));
+        return '<td class="'+(x===B.today?'today':'')+'">'+(b?'<span class="occ'+(b.status==='เช็คอินแล้ว'?' in':'')+'" data-bk="'+esc(b.id)+'" title="'+esc(b.guest)+'">'+esc(b.guest)+'</span>':'')+'</td>'}).join('')+'</tr>';
+    }
+    const un=list.filter(b=>b.type===t.type&&!b.room&&days.some(x=>onNight(b,x)));
+    if(un.length)g+='<tr><td class="rn" style="color:var(--warn)">ยังไม่ระบุ</td>'+days.map(x=>{const n=un.filter(b=>onNight(b,x));
+      return '<td>'+(n.length?'<span class="occ" data-bk="'+esc(n[0].id)+'" style="color:var(--warn)">'+n.length+' ห้อง</span>':'')+'</td>'}).join('')+'</tr>';
+  }
+  h+=g+'</tbody></table></div><p class="small muted" style="margin:8px 0 0">แตะชื่อแขกเพื่อดูหรือแก้การจอง สีเขียวคือเช็คอินแล้ว</p></section>';
+  const cx=B.bookings.filter(b=>!live(b)&&(b.cin===d));
+  if(cx.length)h+=sec('ยกเลิก (เข้าพัก '+dLong(d)+')',cx,b=>'');
+  return h;
+}
+async function loadB(){try{const r=await call('bookings',{date:S.bdate});S.B=r;if(S.pendingOpen){const id=S.pendingOpen;S.pendingOpen=null;openBooking(id);return}if(S.tab==='booking')render(true)}catch(e){if(e.message)toast(e.message)}}
+function render(force){
+  if(!S.D)return;
+  $('#m-label').textContent=thM(S.month);
+  $('#me-name').textContent=S.D.me.name+' · '+(S.D.me.title||S.D.me.role);
+  document.querySelectorAll('[data-admin]').forEach(b=>b.hidden=!isAdmin());
+  if(!isAdmin()&&(S.tab==='settings'||S.tab==='users'))S.tab='record';
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===S.tab)));
+  if(!force&&(S.dirty||(document.activeElement&&view.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')))return;
+  const sy=window.scrollY;
+  document.querySelector('.month').hidden=S.tab==='booking'||S.tab==='calendar';
+  if(S.tab==='booking'&&!S.B&&!S.bloading){S.bloading=true;loadB().finally(()=>S.bloading=false)}
+  if(S.tab==='calendar'&&(!S.C||S.C.month!==S.cmonth)&&!S.cloading)loadC();
+  view.innerHTML=S.tab==='calendar'?vCalendar():S.tab==='booking'?vBooking():S.tab==='count'?vCount():S.tab==='report'?vReport():S.tab==='settings'?vSettings():S.tab==='users'?vUsers():vRecord();
+  window.scrollTo(0,sy);
+  const q=$('#f-qty');if(q)q.focus({preventScroll:true});
+}
+
+/* ---------- events ---------- */
+async function load(){try{apply(await call('state',{}))}catch(e){if(e.message)toast(e.message)}}
+function goMonth(m){if(S.dirty&&!confirmLeave())return;S.month=m;S.open=null;load()}
+let leaveArmed=false;
+function confirmLeave(){if(leaveArmed){leaveArmed=false;S.dirty=false;return true}leaveArmed=true;toast('ยังไม่ได้บันทึก กดอีกครั้งเพื่อออกโดยไม่บันทึก');setTimeout(()=>leaveArmed=false,4000);return false}
+$('#m-prev').onclick=()=>goMonth(monthAdd(S.month,-1));
+$('#m-next').onclick=()=>goMonth(monthAdd(S.month,1));
+$('#b-refresh').onclick=()=>{S.dirty=false;load();if(S.tab==='booking')loadB();if(S.tab==='calendar')loadC()};
+$('#b-logout').onclick=async()=>{try{await call('logout',{})}catch(e){}showLogin('')};
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;if(S.dirty&&!confirmLeave())return;
+  S.tab=b.dataset.tab;S.open=null;S.confirmDel=null;S.editUser=null;S.dirty=false;if(S.tab==='calendar')S.C=null;render(true)});
+
+view.addEventListener('input',e=>{const t=e.target;
+  if(S.bform&&['f-guest','f-phone','f-ref','f-note'].indexOf(t.id)>=0){S.bform[t.id.slice(2)]=t.value;if(t.id==='f-guest'){const sv=$('#b-save'),mi=formMissing();if(sv)sv.disabled=mi.length>0;const g=sv&&sv.previousElementSibling&&sv.previousElementSibling.previousElementSibling;if(g)g.textContent=mi.length?'ยังขาด: '+mi.join(', '):''}return}
+  if(t.id==='f-q'){S.q=t.value;const ql=S.q.trim().toLowerCase();view.querySelectorAll('#ilist .item').forEach(el=>el.hidden=!!ql&&!el.dataset.name.includes(ql));return}
+  if(t.dataset.c){S.dirty=true;const v=num(t.value);const cell=view.querySelector('[data-d="'+t.dataset.c+'"]');const d=v==null?null:v-Number(t.dataset.exp);
+    cell.textContent=d==null?'':d===0?'ตรง':sign(d);cell.className='q '+(d<0?'neg':d>0?'pos':'');return}
+  if(S.tab==='settings'&&t.id!=='s-new')S.dirty=true;
+});
+view.addEventListener('change',e=>{const id=e.target.id;
+  if(id==='b-date'&&e.target.value){S.bdate=e.target.value;S.bform=null;loadB();return}
+  if(S.bform&&id==='f-pick'&&e.target.value){setF('cin',e.target.value);return}
+  if(S.bform&&id==='f-eta'){S.bform.eta=e.target.value;if(S.bform.kind==='temp'){S.bform.tout=hhmmAdd(S.bform.eta,S.bform.hrs||3);fetchBusy()}render(true);return}
+  if(S.bform&&id==='f-tout'){S.bform.tout=e.target.value;fetchBusy();render(true);return}
+  if(e.target.id==='f-date'){S.date=e.target.value;if(S.date&&S.date.slice(0,7)!==S.month){S.month=S.date.slice(0,7);load()}}});
+view.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='s-new'){e.preventDefault();$('#s-add').click()}});
+
+view.addEventListener('click',async e=>{
+  const bk=e.target.closest('[data-bk]');if(bk&&!e.target.closest('button')){openBooking(bk.dataset.bk);return}
+  const cbk=e.target.closest('[data-cbk]');if(cbk){openBooking(cbk.dataset.cbk,S.C);return}
+  const cd=e.target.closest('[data-cd]');if(cd){S.csel=cd.dataset.cd;render(true);return}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.cm!==undefined){const n=+b.dataset.cm;if(n===0)S.cmonth=S.C.today.slice(0,7);else{let [y,m]=S.cmonth.split('-').map(Number);m+=n;if(m>12){m=1;y++}if(m<1){m=12;y--}S.cmonth=y+'-'+pad(m)}
+    S.csel=S.cmonth===localToday().slice(0,7)?localToday():S.cmonth+'-01';render(true);return}
+  if(b.dataset.f){setF(b.dataset.f,b.dataset.v);return}
+  if(b.dataset.room){S.bform.room=b.dataset.room;render(true);return}
+  if(b.hasAttribute('data-fnow')){const n=new Date();S.bform.eta=pad(n.getHours())+':'+pad(n.getMinutes());S.bform.tout=hhmmAdd(S.bform.eta,S.bform.hrs||3);fetchBusy();render(true);return}
+  if(b.dataset.bday){S.bdate=dAdd(S.B?S.B.date:S.bdate,+b.dataset.bday);S.bform=null;loadB();return}
+  if(b.hasAttribute('data-btoday')){S.bdate=S.B.today;S.bform=null;loadB();return}
+  if(b.hasAttribute('data-bnew')){newForm();render(true);const n=$('#f-guest');if(n){n.focus();$('#bform-panel').scrollIntoView({block:'start'})}return}
+  if(b.hasAttribute('data-bclose')){S.bform=null;S.confirmDel=null;render(true);return}
+  if(b.id==='b-save'){const mi=formMissing();if(mi.length){toast('ยังขาด: '+mi.join(', '));return}const f=readForm();
+    b.disabled=true;const isNew=!f.id;
+    try{const r=await call('saveBooking',{date:S.bdate,b:f});S.B=r;S.bform=null;S.C=null;render(true);
+      toast(isNew&&f.channel!=='Agoda'?'บันทึกแล้ว อย่าลืมปิดห้องนี้ใน Agoda (YCS) ด้วย':'บันทึกการจองแล้ว')}
+    catch(err){toast(err.message);b.disabled=false}return}
+  if(b.dataset.bst){const st=b.dataset.bst,id=S.bform&&S.bform.id;if(!id)return;
+    if(st==='cancel'&&S.confirmDel!=='b/'+id){S.confirmDel='b/'+id;render(true);return}
+    S.confirmDel=null;b.disabled=true;const ch=S.bform.channel;
+    try{const r=await call('bookingStatus',{date:S.bdate,id,status:st});S.B=r;S.bform=null;S.C=null;render(true);
+      toast(st==='checkin'?'เช็คอินแล้ว':st==='checkout'?'เช็คเอาท์แล้ว':st==='cancel'?(ch==='Agoda'?'ยกเลิกแล้ว':'ยกเลิกแล้ว อย่าลืมเปิดห้องคืนใน Agoda (YCS)'):'คืนสถานะเป็น "จอง" แล้ว')}
+    catch(err){toast(err.message);b.disabled=false}return}
+  if(b.dataset.open){S.open=S.open===b.dataset.open?null:b.dataset.open;render(true);return}
+  if(b.dataset.jump){S.open=b.dataset.jump;S.q='';render(true);const el=view.querySelector('[data-open="'+b.dataset.jump+'"]');if(el)el.scrollIntoView({block:'center'});return}
+  if(b.dataset.do){const q=Math.round(num($('#f-qty').value)||0);if(q<=0){toast('ใส่จำนวนมากกว่า 0');return}
+    if(!S.date){toast('เลือกวันที่ก่อน');return}
+    const id=S.open,note=$('#f-note').value.trim(),out=b.dataset.do==='out';
+    view.querySelectorAll('[data-do]').forEach(x=>x.disabled=true);
+    const warn=out&&S.date.slice(0,7)===S.D.today.slice(0,7)&&q>S.D.bal[id]?' (เบิกเกินยอดคงเหลือ ตรวจยอดอีกครั้ง)':'';
+    S.open=null;await act('addTx',{date:S.date,itemId:id,q:out?-q:q,note},(out?'เบิกออก ':'รับเข้า ')+itemName(id)+' '+q+' แล้ว'+warn);render(true);return}
+  if(b.dataset.del){if(S.confirmDel!==b.dataset.del){S.confirmDel=b.dataset.del;render(true);return}
+    const id=b.dataset.del;S.confirmDel=null;await act('delTx',{id},'ลบรายการแล้ว');return}
+  if(b.dataset.round){if(S.dirty&&!confirmLeave())return;S.round=b.dataset.round;render(true);return}
+  if(b.id==='c-save'){const values={};view.querySelectorAll('[data-c]').forEach(i=>{const v=num(i.value);values[i.dataset.c]=v==null?null:Math.round(v)});
+    b.disabled=true;if(!await act('saveCount',{round:S.round,values},'บันทึกยอดนับ'+(S.round==='mid'?'กลางเดือน':'สิ้นเดือน')+' แล้ว'))b.disabled=false;return}
+  if(b.id==='r-print'){printReport();return}
+  if(b.id==='r-sheet'){b.disabled=true;try{const r=await call('buildSheet',{});toast('สร้างแท็บ “'+r.sheetName+'” ในชีตแล้ว')}catch(err){toast(err.message)}b.disabled=false;return}
+  if(b.dataset.hide){const id=b.dataset.hide;if(S.confirmDel!=='i/'+id){S.confirmDel='i/'+id;render(true);return}S.confirmDel=null;
+    await act('hideItem',{id},'ซ่อน '+itemName(id)+' แล้ว ข้อมูลเดิมยังอยู่ในชีต');return}
+  if(b.id==='s-add'){const name=$('#s-new').value.trim();if(!name){toast('พิมพ์ชื่อสินค้าก่อน');return}
+    if(S.dirty){toast('กดบันทึกการตั้งค่าก่อนเพิ่มสินค้าใหม่');return}await act('addItem',{name},'เพิ่ม '+name+' แล้ว');return}
+  if(b.id==='s-save'){const items=S.D.items.map(it=>({id:it.id,name:$('#sn-'+it.id).value,open:$('#so-'+it.id).value,min:$('#sm-'+it.id).value}));
+    b.disabled=true;if(!await act('saveItems',{items,start:$('#s-start').value},'บันทึกการตั้งค่าแล้ว'))b.disabled=false;return}
+  if(b.dataset.uedit){S.editUser=b.dataset.uedit;render(true);const n=$('#u-name');if(n)n.focus();return}
+  if(b.hasAttribute('data-ucancel')){S.editUser=null;render(true);return}
+  if(b.id==='u-save'){const a=$('#u-active');
+    const p={oldName:b.dataset.old,name:$('#u-name').value,pin:$('#u-pin').value,role:$('#u-role').value,title:$('#u-title').value,active:a?a.value==='1':true};
+    if(!p.oldName&&!/^\d{4,8}$/.test(p.pin)){toast('PIN ต้องเป็นตัวเลข 4–8 หลัก');return}
+    b.disabled=true;if(await act('saveUser',p,'บันทึกผู้ใช้ '+p.name.trim()+' แล้ว')){S.editUser=null;render(true)}else b.disabled=false;return}
+});
+
+function printReport(){
+  const css='body{font-family:Sarabun,Tahoma,sans-serif;margin:12px;color:#111}table{border-collapse:collapse;font-size:10px;margin:auto}caption{background:#fbe3cf;font-weight:bold;padding:4px;border:1px solid #555;border-bottom:0}th{background:#e7e1f1;font-weight:normal;border:1px solid #555;padding:2px 3px}td{border:1px solid #555;padding:2px 3px;text-align:center;min-width:16px}td.n{text-align:left;white-space:nowrap}.y{background:#fff34d}.r,.low{color:#c4201a}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4 landscape;margin:8mm}';
+  const w=window.open('','_blank');
+  if(!w){toast('เบราว์เซอร์บล็อกหน้าต่างใหม่ ใช้ปุ่ม “สร้างตารางใน Google Sheets” แทน');return}
+  w.document.write('<!doctype html><html lang="th"><head><meta charset="utf-8"><title>การเบิกของ'+thM(S.D.month)+' ท่าเรือ</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap"><style>'+css+'</style></head><body>'+reportTable()+'<script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body></html>');
+  w.document.close();
+}
+
+// โหลดข้อมูลใหม่ทุก 60 วินาทีขณะเปิดหน้าอยู่ (ไม่ทับข้อมูลที่กำลังพิมพ์)
+setInterval(()=>{if(S.D&&document.visibilityState==='visible'&&!S.dirty&&S.busy===0&&!(document.activeElement&&view.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')){
+  if(S.tab==='booking'){if(!S.bform)call('bookings',{date:S.bdate}).then(r=>{S.B=r;if(!S.bform)render()}).catch(()=>{});return}
+  if(S.tab==='calendar'){call('calendar',{cal:S.cmonth}).then(r=>{if(r.month===S.cmonth){S.C=r;render()}}).catch(()=>{});return}
+  call('state',{}).then(d=>{S.D=d;render()}).catch(()=>{})}},60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.D&&!S.dirty){if(S.tab==='booking'){if(!S.bform)loadB()}else if(S.tab==='calendar')loadC();else load()}});
+
+if(S.token){$('#app').hidden=false;load()}else showLogin('');
+/* ---------- หิมะช่วงคริสต์มาส (20 พ.ย. – 6 ม.ค.) ---------- */
+(function(){
+  const t=localToday(),md=t.slice(5);
+  if(!(md>='11-20'||md<='01-06'))return;
+  const btn=$('#b-snow');btn.hidden=false;
+  function on(){if($('#snow'))return;const box=document.createElement('div');box.id='snow';box.setAttribute('aria-hidden','true');
+    const n=window.innerWidth<600?22:36;let h='';
+    for(let k=0;k<n;k++){const sz=(11+Math.random()*13).toFixed(0),dur=(9+Math.random()*12).toFixed(1),del=(-Math.random()*20).toFixed(1),op=(.7+Math.random()*.3).toFixed(2),sw=((Math.random()*2-1)*40).toFixed(0);
+      h+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;font-size:'+sz+'px;opacity:'+op+';animation-duration:'+dur+'s;animation-delay:'+del+'s;--sway:'+sw+'px">'+(Math.random()<.5?'❄':'•')+'</i>'}
+    box.innerHTML=h;document.body.appendChild(box);btn.style.opacity='1'}
+  function off(){const b=$('#snow');if(b)b.remove();btn.style.opacity='.5'}
+  if(store.get('tw_snow')!=='off')on();else off();
+  btn.onclick=()=>{if($('#snow')){off();store.set('tw_snow','off')}else{on();store.set('tw_snow',null)}};
+})();
+})();
+</script>
+</body>
+</html>
